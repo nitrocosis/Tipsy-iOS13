@@ -19,6 +19,12 @@ class CalculatorViewController: UIViewController {
     var tip = 0.0
     var howManyPeople = 2
     var textFieldInput = 0.0
+    var formattedTotal = "0.0"
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        tenPctButton.isSelected = false
+    }
     
     @IBAction func tipChanged(_ sender: UIButton) {
         
@@ -44,15 +50,24 @@ class CalculatorViewController: UIViewController {
     @IBAction func calculatePressed(_ sender: UIButton) {
         
         let amount = billTextField.text!
-
-        textFieldInput = Double(amount)!
+        if amount != "" {
+            textFieldInput = Double(amount)!
+            let total = textFieldInput * (1 + tip) / Double(howManyPeople)
+            formattedTotal = String(format: "%.2f", total)
+        }
         
-        let total = textFieldInput * (1 + tip) / Double(howManyPeople)
+        performSegue(withIdentifier: "showResults", sender: self)
         
-        let formattedTotal = String(format: "%.2f", total)
-        
-        print(formattedTotal)
-        
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showResults" {
+            let destinationVC = segue.destination as! ResultsViewController
+            destinationVC.numberOfPeople = howManyPeople
+            destinationVC.tipPercentage = Int(tip * 100)
+            destinationVC.tipResult = formattedTotal
+            
+        }
     }
     
 }
